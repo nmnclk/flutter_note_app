@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_note_app/controller/auth_controller.dart';
 import 'package:flutter_note_app/controller/note_controller.dart';
 import 'package:flutter_note_app/views/add_note.dart';
 import 'package:flutter_note_app/widgets/note_card.dart';
@@ -13,6 +15,12 @@ class NoteList extends StatefulWidget {
 
 class _NoteListState extends State<NoteList> {
   @override
+  void initState() {
+    super.initState();
+    listenAuth();
+  }
+
+  @override
   Widget build(BuildContext context) {
     //Provider.of<NoteController>(context).printList();
     // debugPrint("Optimized reBuild");
@@ -23,6 +31,15 @@ class _NoteListState extends State<NoteList> {
       ),
       appBar: AppBar(
         title: const Text('Note List'),
+        actions: [
+          TextButton(
+            onPressed: () => singInOut(),
+            child: const Text(
+              "signIn/Out",
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        ],
       ),
       body: Consumer<NoteController>(
         //Witout reBuild build widget shows changes at list
@@ -95,5 +112,24 @@ class _NoteListState extends State<NoteList> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  singInOut() {
+    User? user = Provider.of<AuthController>(context, listen: false).user;
+    if (user == null) {
+      Provider.of<AuthController>(context, listen: false).signInAnon();
+    } else {
+      Provider.of<AuthController>(context, listen: false).signOut();
+    }
+  }
+
+  void listenAuth() {
+    FirebaseAuth.instance.userChanges().listen((User? user) {
+      if (user == null) {
+        debugPrint('User is currently signed out!');
+      } else {
+        debugPrint('User is signed in! uid:${user.uid}');
+      }
+    });
   }
 }

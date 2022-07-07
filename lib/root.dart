@@ -7,13 +7,14 @@ class Root extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isLogin = false;
+    bool isLogin = true;
     // ignore: dead_code
     if (isLogin) {
       return NoteList(
         key: key,
       );
     }
+    // ignore: dead_code
     return LoginPage(
       key: key,
     );
